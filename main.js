@@ -33,24 +33,49 @@ function renderResults(results) {
   // Helper to format euro values
   const euro = v => v.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
 
-  // List of result keys and their labels
+  // Get current language translations
+  const getCurrentTranslations = () => {
+    const currentLanguage = window.getCurrentLanguage ? window.getCurrentLanguage() : 'de';
+    const translations = {
+      de: {
+        brutto: 'Brutto', netto: 'Netto', lohnsteuer: 'Lohnsteuer', soli: 'Soli', 
+        kirche: 'Kirchensteuer', kv: 'Krankenversicherung', rv: 'Rentenversicherung', 
+        alv: 'Arbeitslosenversicherung', pv: 'Pflegeversicherung'
+      },
+      en: {
+        brutto: 'Gross', netto: 'Net', lohnsteuer: 'Income Tax', soli: 'Solidarity Surcharge', 
+        kirche: 'Church Tax', kv: 'Health Insurance', rv: 'Pension Insurance', 
+        alv: 'Unemployment Insurance', pv: 'Care Insurance'
+      },
+      es: {
+        brutto: 'Bruto', netto: 'Neto', lohnsteuer: 'Impuesto sobre la Renta', soli: 'Recargo de Solidaridad', 
+        kirche: 'Impuesto Eclesiástico', kv: 'Seguro de Salud', rv: 'Seguro de Pensiones', 
+        alv: 'Seguro de Desempleo', pv: 'Seguro de Cuidados'
+      }
+    };
+    return translations[currentLanguage] || translations.de;
+  };
+
+  const t = getCurrentTranslations();
+
+  // List of result keys and their labels with info keys
   const keys = [
-    { key: 'brutto', label: 'Brutto' },
-    { key: 'netto', label: 'Netto' },
-    { key: 'lohnsteuer', label: 'Lohnsteuer' },
-    { key: 'soli', label: 'Soli' },
-    { key: 'kirche', label: 'Kirchensteuer' },
-    { key: 'kv', label: 'Krankenversicherung' },
-    { key: 'rv', label: 'Rentenversicherung' },
-    { key: 'alv', label: 'Arbeitslosenversicherung' },
-    { key: 'pv', label: 'Pflegeversicherung' }
+    { key: 'brutto', label: t.brutto, infoKey: 'gross' },
+    { key: 'netto', label: t.netto, infoKey: 'net' },
+    { key: 'lohnsteuer', label: t.lohnsteuer, infoKey: 'incomeTax' },
+    { key: 'soli', label: t.soli, infoKey: 'solidarity' },
+    { key: 'kirche', label: t.kirche, infoKey: 'churchTax' },
+    { key: 'kv', label: t.kv, infoKey: 'healthInsurance' },
+    { key: 'rv', label: t.rv, infoKey: 'pensionInsurance' },
+    { key: 'alv', label: t.alv, infoKey: 'unemploymentInsurance' },
+    { key: 'pv', label: t.pv, infoKey: 'careInsurance' }
   ];
 
   // Render monthly
   const monthlyBreakdown = document.getElementById('monthlyBreakdown');
   if (monthlyBreakdown) {
-    monthlyBreakdown.innerHTML = keys.map(({ key, label }) =>
-      `<div><span>${label}:</span> <span>${euro(monthly[key])}</span></div>`
+    monthlyBreakdown.innerHTML = keys.map(({ key, label, infoKey }) =>
+      `<div><span>${label}: <span class="info-btn" data-key="${infoKey}">?</span></span> <span>${euro(monthly[key])}</span></div>`
     ).join('');
   } else {
     console.warn('monthlyBreakdown element not found');
@@ -59,19 +84,62 @@ function renderResults(results) {
   // Render yearly
   const yearlyBreakdown = document.getElementById('yearlyBreakdown');
   if (yearlyBreakdown) {
-    yearlyBreakdown.innerHTML = keys.map(({ key, label }) =>
-      `<div><span>${label}:</span> <span>${euro(yearly[key])}</span></div>`
+    yearlyBreakdown.innerHTML = keys.map(({ key, label, infoKey }) =>
+      `<div><span>${label}: <span class="info-btn" data-key="${infoKey}">?</span></span> <span>${euro(yearly[key])}</span></div>`
     ).join('');
   } else {
     console.warn('yearlyBreakdown element not found');
   }
+
+  // Add event listeners for info buttons
+  setupInfoButtons();
 }
 
-
-
-
+// Function to set up info button event listeners
+function setupInfoButtons() {
+  document.querySelectorAll('.info-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent any parent element click events
+      const key = btn.getAttribute('data-key');
+      const currentLanguage = window.getCurrentLanguage ? window.getCurrentLanguage() : 'de';
+      const salaryInfoTexts = window.salaryInfoTexts || {};
+      const infoText = salaryInfoTexts[key]?.[currentLanguage] || 'Keine Information verfügbar.';
+      alert(infoText);
+    });
+  });
+}
 
 window.addEventListener('DOMContentLoaded', function () {
+  console.log('DOM loaded, initializing...');
+  
+  // Test if calculation functions are available
+  console.log('Testing calculation functions...');
+  try {
+    const testResult = calculateIncomeTax2025(30000);
+    console.log('calculateIncomeTax2025 test result:', testResult);
+  } catch (error) {
+    console.error('Error testing calculation functions:', error);
+  }
+  
+  // Initialize language system
+  if (window.initLanguage) {
+    window.initLanguage();
+    console.log('Language system initialized');
+  } else {
+    console.error('initLanguage function not found');
+  }
+  
+  // Add language selector event listeners
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const lang = this.getAttribute('data-lang');
+      if (window.setLanguage) {
+        window.setLanguage(lang);
+        console.log('Language set to:', lang);
+      }
+    });
+  });
+  
   const form = document.getElementById('salary-form');
   if (!form) {
     console.error('Form with id "salary-form" not found!');
@@ -88,6 +156,8 @@ window.addEventListener('DOMContentLoaded', function () {
       return;
     }
     const grossIncome = parseFloat(grossIncomeInput.value) || 0;
+    console.log('Gross income:', grossIncome);
+    
     const incomePeriod = document.getElementById('incomePeriod').value;
     const isMarried = document.getElementById('isMarried').checked;
     const isSingleParent = document.getElementById('isSingleParent').checked;
@@ -97,11 +167,14 @@ window.addEventListener('DOMContentLoaded', function () {
     const isInSaxony = document.getElementById('isInSaxony').checked;
     const healthZusatzbeitrag = parseFloat(document.getElementById('zusatzbeitrag').value) || 2.5;
 
+    console.log('Form values read successfully');
+    
     // Determine church region (for demo, always 'OTHER', but could be a select in future)
     const churchRegion = 'OTHER';
 
     // Convert to yearly if needed
     const annualGrossIncome = incomePeriod === 'monthly' ? grossIncome * 12 : grossIncome;
+    console.log('Annual gross income:', annualGrossIncome);
 
     // Build input object
     const inputs = {

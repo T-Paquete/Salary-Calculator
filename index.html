@@ -3,70 +3,91 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Netto Gehaltsrechner 2025</title>
+  <title data-i18n="title">Netto Gehaltsrechner 2025</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <header>
+    <div class="language-selector">
+      <button class="lang-btn active" data-lang="de">
+        <span class="flag">🇩🇪</span> DE
+      </button>
+      <button class="lang-btn" data-lang="en">
+        <span class="flag">🇬🇧</span> EN
+      </button>
+      <button class="lang-btn" data-lang="es">
+        <span class="flag">🇪🇸</span> ES
+      </button>
+    </div>
+  </header>
   <main>
-    <h1>Netto Gehaltsrechner 2025</h1>
+    <h1 data-i18n="title">Netto Gehaltsrechner 2025</h1>
     <form id="salary-form">
       <section id="inputs">
         <div>
-          <label for="grossIncome">Bruttoeinkommen (€):</label>
+          <label for="grossIncome" data-i18n="grossIncome">Bruttoeinkommen (€):</label>
           <input type="number" id="grossIncome" name="grossIncome" min="0" step="0.01" required>
         </div>
         <div>
-          <label for="incomePeriod">Zeitraum:</label>
+          <label for="incomePeriod" data-i18n="period">Zeitraum:</label>
           <select id="incomePeriod" name="incomePeriod">
-            <option value="monthly">Monatlich</option>
-            <option value="yearly">Jährlich</option>
+            <option value="monthly" data-i18n="monthly">Monatlich</option>
+            <option value="yearly" data-i18n="yearly">Jährlich</option>
           </select>
         </div>
         <div>
           <input type="checkbox" id="isMarried" name="isMarried">
-          <label for="isMarried">Verheiratet</label>
+          <label for="isMarried" data-i18n="married">Verheiratet</label>
         </div>
         <div>
           <input type="checkbox" id="isSingleParent" name="isSingleParent">
-          <label for="isSingleParent">Alleinerziehend</label>
+          <label for="isSingleParent" data-i18n="singleParent">Alleinerziehend</label>
         </div>
         <div>
           <input type="checkbox" id="isChurchTax" name="isChurchTax">
-          <label for="isChurchTax">Kirchensteuerpflichtig</label>
+          <label for="isChurchTax" data-i18n="churchTax">Kirchensteuerpflichtig</label>
         </div>
         <div>
           <input type="checkbox" id="isPrivatelyInsured" name="isPrivatelyInsured">
-          <label for="isPrivatelyInsured">Privat versichert</label>
+          <label for="isPrivatelyInsured" data-i18n="privateInsurance">Privat versichert</label>
         </div>
         <div>
           <input type="checkbox" id="isInSaxony" name="isInSaxony">
-          <label for="isInSaxony">Wohnhaft in Sachsen</label>
+          <label for="isInSaxony" data-i18n="livesInSaxony">Wohnhaft in Sachsen</label>
         </div>
         <div>
-          <label for="numChildren">Anzahl Kinder (0–10):</label>
+          <label for="numChildren" data-i18n="numChildren">Anzahl Kinder (0–10):</label>
           <input type="number" id="numChildren" name="numChildren" min="0" max="10" step="1" value="0">
         </div>
         <div>
-          <label for="zusatzbeitrag">Zusatzbeitrag (%):</label>
+          <label for="zusatzbeitrag" data-i18n="zusatzbeitrag">Zusatzbeitrag (%):</label>
           <input type="number" id="zusatzbeitrag" name="zusatzbeitrag" min="0" max="5" step="0.1" value="2.5">
         </div>
         <div>
-          <button type="submit" id="submitBtn">Berechnen</button>
+          <button type="submit" id="submitBtn" data-i18n="calculate">Berechnen</button>
         </div>
       </section>
     </form>
     <section id="results">
-      <h2>Ergebnisse</h2>
+      <h2 data-i18n="results">Ergebnisse</h2>
       <div id="monthlyResults">
-        <h3>Monatlich</h3>
+        <h3 data-i18n="monthlyResults">Monatlich</h3>
         <div id="monthlyBreakdown"></div>
       </div>
       <div id="yearlyResults">
-        <h3>Jährlich</h3>
+        <h3 data-i18n="yearlyResults">Jährlich</h3>
         <div id="yearlyBreakdown"></div>
       </div>
     </section>
   </main>
+  
+  <footer>
+    <p data-i18n="disclaimer">
+      Haftungsausschluss: Dieser Rechner dient nur zur groben Orientierung und ersetzt keine professionelle Steuerberatung. Alle Berechnungen erfolgen ohne Gewähr. Die tatsächlichen Steuer- und Sozialversicherungsabgaben können abweichen.
+    </p>
+  </footer>
+  
+  <script src="language.js"></script>
   <script type="module" src="main.js"></script>
 </body>
 </html>
