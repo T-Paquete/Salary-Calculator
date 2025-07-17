@@ -126,17 +126,12 @@ function initLanguage() {
 window.setLanguage = setLanguage;
 window.initLanguage = initLanguage;
 window.getCurrentLanguage = () => currentLanguage;
-window.salaryInfoTexts = salaryInfoTexts;
-
-
-
-
 
 //---------------------------------------------------------------------------------------
 // Help box
 //---------------------------------------------------------------------------------------
 
-export const salaryInfoTexts = {
+const salaryInfoTexts = {
   gross: {
     de: "Bruttogehalt ist das Einkommen vor Steuern und Sozialabgaben.",
     en: "Gross income is the amount before taxes and social contributions.",
@@ -183,3 +178,6 @@ export const salaryInfoTexts = {
     es: "Seguro de cuidados: 1.8% (con hijos), 2.4% (sin hijos). Reducciones con hijos múltiples. Tasa mayor en Sajonia."
   }
 };
+
+// Make salaryInfoTexts available globally
+window.salaryInfoTexts = salaryInfoTexts;
