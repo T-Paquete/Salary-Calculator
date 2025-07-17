@@ -1,0 +1,54 @@
+
+# macOS system files
+
+.DS\_Store
+.AppleDouble
+.LSOverride
+
+# VS Code settings
+
+.vscode/
+
+# Node dependencies (if later added)
+
+node\_modules/
+
+# Build output (if ever used)
+
+dist/
+build/
+
+# Logs
+
+\*.log
+
+# OS metadata
+
+Icon?
+.\_\*
+
+# Temporary files
+
+\*.tmp
+\*.swp
+\*.swo
+
+# System trash
+
+.Trashes
+
+# Backup files
+
+\*.bak
+\*\~
+
+# Environment files
+
+.env
+.env.\*
+
+# Coverage or test output (optional)
+
+coverage/
+
+
