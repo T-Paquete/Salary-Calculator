@@ -1,247 +1,143 @@
+document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('salary-form');
 
-import { calcAll } from './calculations.js';
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
 
-const grossEl = document.getElementById('gross');
-const langEl  = document.getElementById('lang');
-const btn     = document.getElementById('calculate-btn');
-const periodBtns = document.querySelectorAll('.period-btn');
+    // Read values from form
+    const grossIncome = parseFloat(document.getElementById('grossIncome').value) || 0;
+    const incomePeriod = document.getElementById('incomePeriod').value;
+    const isMarried = document.getElementById('isMarried').checked;
+    const isSingleParent = document.getElementById('isSingleParent').checked;
+    const numChildren = parseInt(document.getElementById('numChildren').value, 10) || 0;
+    const isChurchMember = document.getElementById('isChurchTax').checked;
+    const isPrivatelyInsured = document.getElementById('isPrivatelyInsured').checked;
+    const isInSaxony = document.getElementById('isInSaxony').checked;
+    const healthZusatzbeitrag = parseFloat(document.getElementById('zusatzbeitrag').value) || 2.5;
 
-let currentPeriod = 'monthly';
+    // Determine church region (for demo, always 'OTHER', but could be a select in future)
+    const churchRegion = 'OTHER';
 
-const outIds = ['incomeTax','soli','church','health','pension','unemployment','care'];
+    // Convert to yearly if needed
+    const annualGrossIncome = incomePeriod === 'monthly' ? grossIncome * 12 : grossIncome;
 
-const texts = {
-  de: { 
-    title: 'Netto-Gehaltsrechner',
-    gross: 'Dein Brutto beträgt',
-    net: 'Dein Netto beträgt',  
-    incomeTax: 'Lohnsteuer', 
-    soli: 'Solidaritätszuschlag', 
-    church: 'Kirchensteuer', 
-    health: 'Krankenversicherung', 
-    pension: 'Rentenversicherung', 
-    unemployment: 'Arbeitslosenvers.', 
-    care: 'Pflegeversicherung',
-    monthly: 'Monatlich',
-    yearly: 'Jährlich', 
-    calculate: 'Berechnen',
-    placeholder: 'Bruttogehalt €',
-    deductions: 'Abzüge:',
-    disclaimer: 'Dies ist ein vereinfachter Rechner nur zu Demonstrationszwecken. Echte deutsche Steuerberechnungen sind komplexer und können je nach individuellen Umständen variieren.'
-  },
-  en: { 
-    title: 'Net Salary Calculator',
-    gross: 'Your gross salary is',
-    net: 'Your net salary is', 
-    incomeTax: 'Income tax',  
-    soli: 'Solidarity surcharge', 
-    church: 'Church tax',      
-    health: 'Health insurance', 
-    pension: 'Pension insurance', 
-    unemployment: 'Unemployment ins.', 
-    care: 'Nursing care ins.',
-    monthly: 'Monthly',
-    yearly: 'Yearly',
-    calculate: 'Calculate',
-    placeholder: 'Gross salary €',
-    deductions: 'Deductions:',
-    disclaimer: 'This is a simplified calculator for demonstration purposes only. Real German tax calculations are more complex and may vary based on individual circumstances.'
-  },
-  es: { 
-    title: 'Calculadora de Salario Neto',
-    gross: 'Tu salario bruto es',
-    net: 'Tu sueldo neto es',  
-    incomeTax: 'Impuesto sobre la renta', 
-    soli: 'Suplemento de solidaridad', 
-    church: 'Impuesto eclesiástico', 
-    health: 'Seguro médico', 
-    pension: 'Seguro de pensión', 
-    unemployment: 'Seguro de desempleo', 
-    care: 'Seguro de cuidados',
-    monthly: 'Mensual',
-    yearly: 'Anual',
-    calculate: 'Calcular', 
-    placeholder: 'Salario bruto €',
-    deductions: 'Deducciones:',
-    disclaimer: 'Esta es una calculadora simplificada solo para fines de demostración. Los cálculos reales de impuestos alemanes son más complejos y pueden variar según las circunstancias individuales.'
-  }
-};
+    // Build input object
+    const inputs = {
+      annualGrossIncome,
+      isMarried,
+      isSingleParent,
+      numChildren,
+      isChurchMember,
+      churchRegion,
+      isPrivatelyInsured,
+      healthZusatzbeitrag,
+      isInSaxony
+    };
 
-function updateUI() {
-  const t = texts[langEl.value];
-  
-  // Update title and main UI elements
-  document.getElementById('main-title').textContent = t.title;
-  document.getElementById('disclaimer').textContent = t.disclaimer;
-  
-  // Update period buttons
-  document.getElementById('monthly-btn').textContent = t.monthly;
-  document.getElementById('yearly-btn').textContent = t.yearly;
-  
-  // Update period column titles
-  document.getElementById('monthly-title').textContent = t.monthly;
-  document.getElementById('yearly-title').textContent = t.yearly;
-  
-  // Update other UI elements
-  btn.textContent = t.calculate;
-  grossEl.placeholder = t.placeholder;
-  document.getElementById('deductions-title').textContent = t.deductions;
-}
+    // Call calculation function
+    const results = calculateResults(inputs);
+    renderResults(results);
+// Render results in the DOM
+function renderResults(results) {
+  const monthly = results.monthly;
+  const yearly = results.yearly;
 
-function updatePeriodVisibility() {
-  // Always show both monthly and yearly columns
-  const monthlyCol = document.getElementById('period-monthly');
-  const yearlyCol = document.getElementById('period-yearly');
-  
-  monthlyCol.style.display = 'block';
-  yearlyCol.style.display = 'block';
-}
+  // Helper to format euro values
+  const euro = v => v.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
 
-function setPeriod(period) {
-  currentPeriod = period;
-  
-  // Update active button
-  periodBtns.forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.period === period);
-  });
-  
-  // Update period visibility
-  updatePeriodVisibility();
-  
-  // Re-render if there's data
-  if (grossEl.value) {
-    render();
-  }
-}
-
-function render() {
-  const grossValue = grossEl.value;
-  if (!grossValue) return;
-
-  const t = texts[langEl.value];
-  
-  // Calculate all periods from the input
-  const allData = calcAll(grossValue, currentPeriod);
-  if (!allData) return;
-  
-  // Update gross and net for each period column
-  const periods = [
-    { data: allData.monthly, suffix: '-monthly' },
-    { data: allData.yearly, suffix: '-yearly' }
+  // List of result keys and their labels
+  const keys = [
+    { key: 'brutto', label: 'Brutto' },
+    { key: 'netto', label: 'Netto' },
+    { key: 'lohnsteuer', label: 'Lohnsteuer' },
+    { key: 'soli', label: 'Soli' },
+    { key: 'kirche', label: 'Kirchensteuer' },
+    { key: 'kv', label: 'Krankenversicherung' },
+    { key: 'rv', label: 'Rentenversicherung' },
+    { key: 'alv', label: 'Arbeitslosenversicherung' },
+    { key: 'pv', label: 'Pflegeversicherung' }
   ];
-  
-  periods.forEach(({ data, suffix }) => {
-    if (data) {
-      // Update gross and net for this period
-      const grossElement = document.getElementById('gross' + suffix);
-      const netElement = document.getElementById('net' + suffix);
-      
-      if (grossElement) {
-        grossElement.textContent = `${t.gross}: ${data.gross} €`;
-      }
-      if (netElement) {
-        netElement.textContent = `${t.net}: ${data.net} €`;
-      }
-      
-      // Update deductions for this period
-      outIds.forEach(id => {
-        const element = document.getElementById(id + suffix);
-        if (element) {
-          element.textContent = `${t[id]}: ${data[id]} €`;
-        }
-      });
+
+  // Render monthly
+  const monthlyBreakdown = document.getElementById('monthlyBreakdown');
+  monthlyBreakdown.innerHTML = keys.map(({ key, label }) =>
+    `<div><span>${label}:</span> <span>${euro(monthly[key])}</span></div>`
+  ).join('');
+
+  // Render yearly
+  const yearlyBreakdown = document.getElementById('yearlyBreakdown');
+  yearlyBreakdown.innerHTML = keys.map(({ key, label }) =>
+    `<div><span>${label}:</span> <span>${euro(yearly[key])}</span></div>`
+  ).join('');
+}
+  });
+});
+
+
+import {
+  calculateAllowances2025,
+  calculateIncomeTax2025,
+  calculateSolidaritySurcharge2025,
+  calculateChurchTax2025,
+  calculatePensionContribution2025,
+  calculateUnemploymentContribution2025,
+  calculateHealthInsuranceContribution2025,
+  calculateNursingCareContribution2025
+} from './advancedCalculations.js';
+
+function calculateResults(inputs) {
+  const {
+    annualGrossIncome,
+    isMarried,
+    isSingleParent,
+    numChildren,
+    isChurchMember,
+    churchRegion,
+    isPrivatelyInsured,
+    healthZusatzbeitrag,
+    isInSaxony
+  } = inputs;
+
+  // Calculate allowances and taxable income
+  const allowances = calculateAllowances2025({ isMarried, numChildren, isSingleParent });
+  const taxableIncome = Math.max(0, annualGrossIncome - allowances);
+
+  // Calculate deductions
+  const lohnsteuer = calculateIncomeTax2025(taxableIncome);
+  const soli = calculateSolidaritySurcharge2025(lohnsteuer, isMarried);
+  const kirche = calculateChurchTax2025({ incomeTax: lohnsteuer, isChurchMember, region: churchRegion });
+  const rv = calculatePensionContribution2025(annualGrossIncome);
+  const alv = calculateUnemploymentContribution2025(annualGrossIncome);
+  const kv = calculateHealthInsuranceContribution2025(annualGrossIncome, { zusatzbeitrag: healthZusatzbeitrag, isPrivatelyInsured });
+  const pv = calculateNursingCareContribution2025(annualGrossIncome, { numChildren, isInSaxony });
+
+  // Total deductions
+  const totalDeductions = lohnsteuer + soli + kirche + rv + alv + kv + pv;
+  const netto = annualGrossIncome - totalDeductions;
+
+  // Return yearly and monthly breakdowns
+  return {
+    yearly: {
+      brutto: Math.round(annualGrossIncome),
+      netto: Math.round(netto),
+      lohnsteuer: Math.round(lohnsteuer),
+      soli: Math.round(soli),
+      kirche: Math.round(kirche),
+      kv: Math.round(kv),
+      rv: Math.round(rv),
+      alv: Math.round(alv),
+      pv: Math.round(pv)
+    },
+    monthly: {
+      brutto: Math.round(annualGrossIncome / 12),
+      netto: Math.round(netto / 12),
+      lohnsteuer: Math.round(lohnsteuer / 12),
+      soli: Math.round(soli / 12),
+      kirche: Math.round(kirche / 12),
+      kv: Math.round(kv / 12),
+      rv: Math.round(rv / 12),
+      alv: Math.round(alv / 12),
+      pv: Math.round(pv / 12)
     }
-  });
+  };
 }
-
-// Event listeners
-btn.addEventListener('click', render);
-langEl.addEventListener('change', () => {
-  updateUI();
-  render();
-});
-grossEl.addEventListener('input', () => btn.disabled = !grossEl.value);
-
-periodBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    setPeriod(btn.dataset.period);
-  });
-});
-
-// Initialize UI
-updateUI();
-updatePeriodVisibility();
-
-
-// --- Configuration -----------------------------------------------------------
-const RATES = {
-  incomeTax: 0.14,      // 14 % of gross
-  soli: 0.055,          // 5.5 % of income tax
-  church: 0.08,         // 8 %  of income tax
-  health: 0.073,        // 7.3 % of gross
-  pension: 0.093,       // 9.3 % of gross
-  unemployment: 0.012,  // 1.2 % of gross
-  care: 0.01525         // 1.525 % of gross
-};
-
-// --- Helpers -----------------------------------------------------------------
-/**
- * Round to two decimal places (banker‑style rounding).
- * @param {number} value
- * @returns {number}
- */
-function round2(value) {
-  return Math.round((value + Number.EPSILON) * 100) / 100;
-}
-
-// --- Core API ----------------------------------------------------------------
-/**
- * Calculate net salary from a given gross salary.
- *
- * @param {number|string} grossInput
- * @returns {number}
- */
-export function calculateNetSalary(grossInput) {
-  const gross = parseFloat(grossInput);
-  if (isNaN(gross) || gross < 0) return 0;
-
-  // Step 1: income‑tax‑based deductions
-  const incomeTax = gross * RATES.incomeTax;
-  const soli      = incomeTax * RATES.soli;
-  const church    = incomeTax * RATES.church;
-
-  // Step 2: gross‑based social contributions
-  const health        = gross * RATES.health;
-  const pension       = gross * RATES.pension;
-  const unemployment  = gross * RATES.unemployment;
-  const care          = gross * RATES.care;
-
-  const totalDeductions = incomeTax + soli + church +
-                          health + pension + unemployment + care;
-
-  return round2(gross - totalDeductions);
-}
-
-/**
- * Build a localized sentence that contains the net salary.
- *
- * @param {number|string} grossInput   Gross salary in EUR
- * @param {string}        lang         ISO‑like code: "de", "en", "es"
- * @returns {string}                   Sentence in the chosen language.
- */
-export function netSentence(grossInput, lang = "de") {
-  const net = calculateNetSalary(grossInput).toFixed(2);
-
-  switch (lang) {
-    case "en":
-      return `Your net salary is ${net} €.`;
-    case "es":
-      return `Tu sueldo neto es ${net} €.`;
-    case "de":
-    default:
-      return `Dein Netto beträgt ${net} €.`;
-  }
-}
-
-// Optional default export (handy for consumers who prefer a single import)
-export default { calculateNetSalary, netSentence };

@@ -1,76 +1,71 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Net Salary Calculator</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Netto Gehaltsrechner 2025</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <div class="language-selector">
-            <select id="lang">
-                <option value="de">🇩🇪 Deutsch</option>
-                <option value="en">🇺🇸 English</option>
-                <option value="es">🇪🇸 Español</option>
-            </select>
+  <main>
+    <h1>Netto Gehaltsrechner 2025</h1>
+    <form id="salary-form">
+      <section id="inputs">
+        <div>
+          <label for="grossIncome">Bruttoeinkommen (€):</label>
+          <input type="number" id="grossIncome" name="grossIncome" min="0" step="0.01" required>
         </div>
-
-        <div class="card">
-            <h1 id="main-title">Net Salary Calculator</h1>
-            
-            <div class="input-group">
-                <div class="period-selector">
-                    <button type="button" class="period-btn active" data-period="monthly" id="monthly-btn">Monatlich</button>
-                    <button type="button" class="period-btn" data-period="yearly" id="yearly-btn">Jährlich</button>
-                </div>
-                <input type="number" id="gross" placeholder="Bruttogehalt €" min="0" step="0.01">
-                <button disabled id="calculate-btn">Berechnen / Calculate</button>
-            </div>
-
-            <div class="results">
-                <div class="deductions">
-                    <h3 id="deductions-title">Deductions / Abzüge:</h3>
-                    <div class="deduction-periods">
-                        <div class="period-column" id="period-monthly">
-                            <h4 id="monthly-title">Monthly</h4>
-                            <div class="salary-summary">
-                                <div class="salary-item gross" id="gross-monthly"></div>
-                                <div class="salary-item net" id="net-monthly"></div>
-                            </div>
-                            <div class="deduction-item" id="incomeTax-monthly"></div>
-                            <div class="deduction-item" id="soli-monthly"></div>
-                            <div class="deduction-item" id="church-monthly"></div>
-                            <div class="deduction-item" id="health-monthly"></div>
-                            <div class="deduction-item" id="pension-monthly"></div>
-                            <div class="deduction-item" id="unemployment-monthly"></div>
-                            <div class="deduction-item" id="care-monthly"></div>
-                        </div>
-                        
-                        <div class="period-column" id="period-yearly">
-                            <h4 id="yearly-title">Yearly</h4>
-                            <div class="salary-summary">
-                                <div class="salary-item gross" id="gross-yearly"></div>
-                                <div class="salary-item net" id="net-yearly"></div>
-                            </div>
-                            <div class="deduction-item" id="incomeTax-yearly"></div>
-                            <div class="deduction-item" id="soli-yearly"></div>
-                            <div class="deduction-item" id="church-yearly"></div>
-                            <div class="deduction-item" id="health-yearly"></div>
-                            <div class="deduction-item" id="pension-yearly"></div>
-                            <div class="deduction-item" id="unemployment-yearly"></div>
-                            <div class="deduction-item" id="care-yearly"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div>
+          <label for="incomePeriod">Zeitraum:</label>
+          <select id="incomePeriod" name="incomePeriod">
+            <option value="monthly">Monatlich</option>
+            <option value="yearly">Jährlich</option>
+          </select>
         </div>
-        
-        <footer class="footer">
-            <p id="disclaimer">This is a simplified calculator for demonstration purposes only. Real German tax calculations are more complex and may vary based on individual circumstances.</p>
-        </footer>
-    </div>
-
-    <script type="module" src="main.js"></script>
+        <div>
+          <input type="checkbox" id="isMarried" name="isMarried">
+          <label for="isMarried">Verheiratet</label>
+        </div>
+        <div>
+          <input type="checkbox" id="isSingleParent" name="isSingleParent">
+          <label for="isSingleParent">Alleinerziehend</label>
+        </div>
+        <div>
+          <input type="checkbox" id="isChurchTax" name="isChurchTax">
+          <label for="isChurchTax">Kirchensteuerpflichtig</label>
+        </div>
+        <div>
+          <input type="checkbox" id="isPrivatelyInsured" name="isPrivatelyInsured">
+          <label for="isPrivatelyInsured">Privat versichert</label>
+        </div>
+        <div>
+          <input type="checkbox" id="isInSaxony" name="isInSaxony">
+          <label for="isInSaxony">Wohnhaft in Sachsen</label>
+        </div>
+        <div>
+          <label for="numChildren">Anzahl Kinder (0–10):</label>
+          <input type="number" id="numChildren" name="numChildren" min="0" max="10" step="1" value="0">
+        </div>
+        <div>
+          <label for="zusatzbeitrag">Zusatzbeitrag (%):</label>
+          <input type="number" id="zusatzbeitrag" name="zusatzbeitrag" min="0" max="5" step="0.1" value="2.5">
+        </div>
+        <div>
+          <button type="submit" id="submitBtn">Berechnen</button>
+        </div>
+      </section>
+    </form>
+    <section id="results">
+      <h2>Ergebnisse</h2>
+      <div id="monthlyResults">
+        <h3>Monatlich</h3>
+        <div id="monthlyBreakdown"></div>
+      </div>
+      <div id="yearlyResults">
+        <h3>Jährlich</h3>
+        <div id="yearlyBreakdown"></div>
+      </div>
+    </section>
+  </main>
 </body>
 </html>
