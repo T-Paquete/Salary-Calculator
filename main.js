@@ -1,18 +1,4 @@
 
-// 💡 Please check why the calculator form is not displaying results when I enter the gross income (e.g., 10000) and submit. Diagnose and fix the problem. Specifically:
-// Ensure the form has a valid id (e.g., salary-form) and that an event listener is correctly attached to handle the submit.
-// Make sure the JavaScript file is correctly linked using <script type="module" src="main.js"> in index.html.
-// Verify that the grossIncome input field has the correct id and its value is being read properly.
-// Ensure the calculateResults(inputs) function is being called and returns values.
-// Make sure the renderResults(results) function is inserting the output into the correct DOM elements with the proper ids.
-// Add meaningful console.log() statements to confirm each step is working.
-// After making corrections, ensure that:
-// Entering a value and submitting triggers calculations
-// The results appear in both the Monthly and Yearly sections
-
-// --- ENSURE THIS FILE IS LOADED AS A MODULE IN index.html ---
-// <script type="module" src="main.js"></script>
-
 import {
   calculateAllowances2025,
   calculateIncomeTax2025,
@@ -108,6 +94,9 @@ function setupInfoButtons() {
     });
   });
 }
+
+// Make setupInfoButtons available globally
+window.setupInfoButtons = setupInfoButtons;
 
 window.addEventListener('DOMContentLoaded', function () {
   console.log('DOM loaded, initializing...');

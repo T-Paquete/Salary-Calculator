@@ -114,6 +114,87 @@ function updatePageContent() {
       }
     }
   });
+  
+  // Update dynamically generated result labels if results exist
+  updateResultLabels();
+}
+
+function updateResultLabels() {
+  // Check if results exist by looking for result breakdown elements
+  const monthlyBreakdown = document.getElementById('monthlyBreakdown');
+  const yearlyBreakdown = document.getElementById('yearlyBreakdown');
+  
+  if (!monthlyBreakdown || !yearlyBreakdown || !monthlyBreakdown.hasChildNodes()) {
+    return; // No results to update
+  }
+  
+  // Get current language translations for result labels
+  const t = translations[currentLanguage];
+  const labelTranslations = {
+    de: {
+      brutto: 'Brutto', netto: 'Netto', lohnsteuer: 'Lohnsteuer', soli: 'Soli', 
+      kirche: 'Kirchensteuer', kv: 'Krankenversicherung', rv: 'Rentenversicherung', 
+      alv: 'Arbeitslosenversicherung', pv: 'Pflegeversicherung'
+    },
+    en: {
+      brutto: 'Gross', netto: 'Net', lohnsteuer: 'Income Tax', soli: 'Solidarity Surcharge', 
+      kirche: 'Church Tax', kv: 'Health Insurance', rv: 'Pension Insurance', 
+      alv: 'Unemployment Insurance', pv: 'Care Insurance'
+    },
+    es: {
+      brutto: 'Bruto', netto: 'Neto', lohnsteuer: 'Impuesto sobre la Renta', soli: 'Recargo de Solidaridad', 
+      kirche: 'Impuesto Eclesiástico', kv: 'Seguro de Salud', rv: 'Seguro de Pensiones', 
+      alv: 'Seguro de Desempleo', pv: 'Seguro de Cuidados'
+    }
+  };
+  
+  const labels = labelTranslations[currentLanguage] || labelTranslations.de;
+  
+  // Keys in the order they appear in results
+  const resultKeys = ['brutto', 'netto', 'lohnsteuer', 'soli', 'kirche', 'kv', 'rv', 'alv', 'pv'];
+  
+  // Update monthly results
+  const monthlyDivs = monthlyBreakdown.querySelectorAll('div');
+  monthlyDivs.forEach((div, index) => {
+    if (index < resultKeys.length) {
+      const key = resultKeys[index];
+      const label = labels[key];
+      const spans = div.querySelectorAll('span');
+      if (spans.length >= 2) {
+        // Update the first span which contains the label and info button
+        const infoBtn = spans[0].querySelector('.info-btn');
+        if (infoBtn) {
+          spans[0].innerHTML = `${label}: ${infoBtn.outerHTML}`;
+        } else {
+          spans[0].textContent = `${label}:`;
+        }
+      }
+    }
+  });
+  
+  // Update yearly results
+  const yearlyDivs = yearlyBreakdown.querySelectorAll('div');
+  yearlyDivs.forEach((div, index) => {
+    if (index < resultKeys.length) {
+      const key = resultKeys[index];
+      const label = labels[key];
+      const spans = div.querySelectorAll('span');
+      if (spans.length >= 2) {
+        // Update the first span which contains the label and info button
+        const infoBtn = spans[0].querySelector('.info-btn');
+        if (infoBtn) {
+          spans[0].innerHTML = `${label}: ${infoBtn.outerHTML}`;
+        } else {
+          spans[0].textContent = `${label}:`;
+        }
+      }
+    }
+  });
+  
+  // Re-setup info buttons since we may have modified the HTML
+  if (window.setupInfoButtons) {
+    window.setupInfoButtons();
+  }
 }
 
 function initLanguage() {
